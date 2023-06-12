@@ -23,12 +23,40 @@ public class ProductDaoImpl implements ProductDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+
+    public List<Product> getProducts() {
+        String sql = "SELECT product_id, " +
+                            "product_name, " +
+                            "category, " +
+                            "image_url, " +
+                            "price, " +
+                            "stock, " +
+                            "description, " +
+                            "created_date, " +
+                            "last_modified_date " +
+                     "FROM product";
+
+        Map<String, Object> map = new HashMap<>();
+
+        List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
+
+        return productList;
+    }
+
     // 1. 記得創建 DATABASE
     // 2. SQL 要分段的話記得加上空格, 不然在輸出時字串會黏在一起造成錯誤
     public Product getProductById(Integer productId) {
-        String sql = "SELECT product_id, product_name, category, image_url, price, stock, description, created_date, last_modified_date " 
-                   + "FROM product " 
-                   + "WHERE product_id = :productId";
+        String sql = "SELECT product_id, " +
+                            "product_name, " +
+                            "category, " +
+                            "image_url, " +
+                            "price, " +
+                            "stock, " +
+                            "description, " +
+                            "created_date, " +
+                            "last_modified_date " +
+                     "FROM product " +
+                     "WHERE product_id = :productId";
 
 
         Map<String, Object> map = new HashMap<>();

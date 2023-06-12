@@ -1,5 +1,7 @@
 package com.maxwell.demo.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +25,20 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     
+    @GetMapping("/products")
+    public ResponseEntity<List<Product>> getProducts() {
+        List<Product> productList = productService.getProducts();
+    
+        // 無論結果為何, 都要回傳 200 OK
+        return ResponseEntity.status(HttpStatus.OK).body(productList);
+    }
+
     @GetMapping("/products/{productId}")
     public ResponseEntity<Product> getProduct(@PathVariable Integer productId) {
      
         Product product = productService.getProductById(productId);
 
+        // 若查詢單項查不到結果, 則回傳 404 NOT FOUND
         if(product != null) 
         {
             return ResponseEntity.status(HttpStatus.OK).body(product);
