@@ -23,8 +23,7 @@ public class ProductDaoImpl implements ProductDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-
-    public List<Product> getProducts() {
+    public List<Product> getProducts(String category, String search) {
         String sql = "SELECT product_id, " +
                             "product_name, " +
                             "category, " +
@@ -34,9 +33,23 @@ public class ProductDaoImpl implements ProductDao {
                             "description, " +
                             "created_date, " +
                             "last_modified_date " +
-                     "FROM product";
+                     "FROM product " + 
+                     "WHERE 1=1 ";
 
         Map<String, Object> map = new HashMap<>();
+
+        // 在加上 WHERE 1=1 後，下面的查詢條件便可以直接拼在 sql 後面
+        // 如此做法可以使 SQL 語法簡潔許多，這個是相當常見的一種用法
+        if(category != null) {
+            sql = sql + " AND category = :category";
+            map.put("category", category);
+        }
+
+        // 要把 "%" 寫在 map.put 裡面，不可以寫在 sql 語句裡面
+        if(search != null) {
+            sql = sql + " AND product_name LIKE :search";
+            map.put("search", "%" + search + "%");
+        }
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 

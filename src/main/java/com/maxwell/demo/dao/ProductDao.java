@@ -7,7 +7,7 @@ import com.maxwell.demo.model.Product;
 
 public interface ProductDao {
 
-    List<Product> getProducts();
+    List<Product> getProducts(String category, String search);
     
     Product getProductById(Integer productId);
 

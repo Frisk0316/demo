@@ -17,10 +17,10 @@ public class ProductServiceImpl implements ProductService {
     private ProductDao productDao;
 
     @Override
-    public List<Product> getProducts() {
-        return productDao.getProducts();
+    public List<Product> getProducts(String category, String search) {
+        return productDao.getProducts(category, search);
     }
-    
+
     @Override
     public Product getProductById(Integer productId) {
         return productDao.getProductById(productId);

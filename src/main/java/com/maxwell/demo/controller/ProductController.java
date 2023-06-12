@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.demo.dto.ProductRequest;
@@ -25,9 +26,15 @@ public class ProductController {
     @Autowired
     private ProductService productService;
     
+    // 如此使得 category 變成必選參數
+    // 但是在一般情況中， category 理論上不應為必選
+    // 因此要在 category 前加上 @RequestParam(required = false)
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts() {
-        List<Product> productList = productService.getProducts();
+    public ResponseEntity<List<Product>> getProducts(
+        @RequestParam(required = false) String category, 
+        @RequestParam(required = false) String search
+    ) {
+        List<Product> productList = productService.getProducts(category, search);
     
         // 無論結果為何, 都要回傳 200 OK
         return ResponseEntity.status(HttpStatus.OK).body(productList);

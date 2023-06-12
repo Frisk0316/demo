@@ -7,7 +7,7 @@ import com.maxwell.demo.model.Product;
 
 public interface ProductService {
 
-    List<Product> getProducts();
+    List<Product> getProducts(String category, String search);
 
     // CRUD
     Product getProductById(Integer productId);
