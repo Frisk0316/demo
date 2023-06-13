@@ -2,11 +2,18 @@ package com.maxwell.demo.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class User {
     
     private Integer userId;
+
     private String email;
+
+    // Response Body 不能回傳 password, 因此要使用 JsonIgnore 忽略之
+    @JsonIgnore
     private String password;
+
     private Date createdDate;
     private Date lastModifiedDate;
 
