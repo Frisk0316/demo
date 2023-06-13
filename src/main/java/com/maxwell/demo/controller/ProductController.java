@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +21,10 @@ import com.maxwell.demo.model.Product;
 import com.maxwell.demo.service.ProductService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
+@Validated
 @RestController
 public class ProductController {
 
@@ -38,7 +42,14 @@ public class ProductController {
         
         // Sorting
         @RequestParam(defaultValue = "created_date") String orderBy,
-        @RequestParam(defaultValue = "desc") String sort
+        @RequestParam(defaultValue = "desc") String sort, 
+
+        // Pagination
+        // limit: 一次秀出幾筆數據, 對應 LIMIT
+        // offset: 前方要跳過的數據, 對應 OFFSET
+        // 要在前方加上 @Validated, @Max 與 @Min 才會生效
+        @RequestParam(defaultValue = "5") @Max(1000) @Min(0) Integer limit,
+        @RequestParam(defaultValue = "0") @Min(0) Integer offset
     ) {
 
         // 使用 productqueryparams 儲存參數, 如此在 controller 便只需傳遞一個參數
@@ -47,6 +58,8 @@ public class ProductController {
         productQueryParams.setSearch(search);
         productQueryParams.setOrderBy(orderBy);
         productQueryParams.setSort(sort);
+        productQueryParams.setLimit(limit);
+        productQueryParams.setOffset(offset);
 
         List<Product> productList = productService.getProducts(productQueryParams);
     

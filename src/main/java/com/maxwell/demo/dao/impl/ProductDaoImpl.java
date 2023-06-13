@@ -39,8 +39,9 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
+        // 查詢條件
         // 在加上 WHERE 1=1 後，下面的查詢條件便可以直接拼在 sql 後面
-        // 如此做法可以使 SQL 語法簡潔許多，這個是相當常見的一種用法
+        // 如此做法可以使 SQL 語法簡潔許多，是相當常見的一種用法
         if(productQueryParams.getCategory() != null) {
             sql = sql + " AND category = :category";
             map.put("category", productQueryParams.getCategory());
@@ -52,9 +53,15 @@ public class ProductDaoImpl implements ProductDao {
             map.put("search", "%" + productQueryParams.getSearch() + "%");
         }
 
+        // 排序
         // 實作時只能使用字串拼接的方式實現 ORDER BY 的語法
-        // 注意空格
+        // 注意要在前方加上空格
         sql = sql + " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
+
+        // 分頁
+        sql = sql + " LIMIT :limit OFFSET :offset";
+        map.put("limit", productQueryParams.getLimit());
+        map.put("offset", productQueryParams.getOffset());
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
