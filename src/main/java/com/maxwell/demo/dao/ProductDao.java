@@ -2,12 +2,13 @@ package com.maxwell.demo.dao;
 
 import java.util.List;
 
+import com.maxwell.demo.dto.ProductQueryParams;
 import com.maxwell.demo.dto.ProductRequest;
 import com.maxwell.demo.model.Product;
 
 public interface ProductDao {
 
-    List<Product> getProducts(String category, String search);
+    List<Product> getProducts(ProductQueryParams productQueryParams);
     
     Product getProductById(Integer productId);
 

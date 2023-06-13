@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.maxwell.demo.dto.ProductQueryParams;
 import com.maxwell.demo.dto.ProductRequest;
 import com.maxwell.demo.model.Product;
 import com.maxwell.demo.service.ProductService;
@@ -34,7 +35,13 @@ public class ProductController {
         @RequestParam(required = false) String category, 
         @RequestParam(required = false) String search
     ) {
-        List<Product> productList = productService.getProducts(category, search);
+
+        // 使用 productqueryparams 儲存參數, 如此在 controller 便只需傳遞一個參數
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setCategory(category);
+        productQueryParams.setSearch(search);
+
+        List<Product> productList = productService.getProducts(productQueryParams);
     
         // 無論結果為何, 都要回傳 200 OK
         return ResponseEntity.status(HttpStatus.OK).body(productList);

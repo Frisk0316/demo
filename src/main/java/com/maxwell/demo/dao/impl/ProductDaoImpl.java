@@ -13,6 +13,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.maxwell.demo.dao.ProductDao;
+import com.maxwell.demo.dto.ProductQueryParams;
 import com.maxwell.demo.dto.ProductRequest;
 import com.maxwell.demo.model.Product;
 import com.maxwell.demo.rowmapper.ProductRowMapper;
@@ -23,7 +24,7 @@ public class ProductDaoImpl implements ProductDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public List<Product> getProducts(String category, String search) {
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT product_id, " +
                             "product_name, " +
                             "category, " +
@@ -40,15 +41,15 @@ public class ProductDaoImpl implements ProductDao {
 
         // 在加上 WHERE 1=1 後，下面的查詢條件便可以直接拼在 sql 後面
         // 如此做法可以使 SQL 語法簡潔許多，這個是相當常見的一種用法
-        if(category != null) {
+        if(productQueryParams.getCategory() != null) {
             sql = sql + " AND category = :category";
-            map.put("category", category);
+            map.put("category", productQueryParams.getCategory());
         }
 
         // 要把 "%" 寫在 map.put 裡面，不可以寫在 sql 語句裡面
-        if(search != null) {
+        if(productQueryParams.getSearch() != null) {
             sql = sql + " AND product_name LIKE :search";
-            map.put("search", "%" + search + "%");
+            map.put("search", "%" + productQueryParams.getSearch() + "%");
         }
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
