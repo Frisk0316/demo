@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -31,18 +32,7 @@ public class ProductDaoImpl implements ProductDao {
         Map<String, Object> map = new HashMap<>();
 
         // 查詢條件
-        // 在加上 WHERE 1=1 後，下面的查詢條件便可以直接拼在 sql 後面
-        // 如此做法可以使 SQL 語法簡潔許多，是相當常見的一種用法
-        if(productQueryParams.getCategory() != null) {
-            sql = sql + " AND category = :category";
-            map.put("category", productQueryParams.getCategory());
-        }
-
-        // 要把 "%" 寫在 map.put 裡面，不可以寫在 sql 語句裡面
-        if(productQueryParams.getSearch() != null) {
-            sql = sql + " AND product_name LIKE :search";
-            map.put("search", "%" + productQueryParams.getSearch() + "%");
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
 
@@ -66,18 +56,7 @@ public class ProductDaoImpl implements ProductDao {
         Map<String, Object> map = new HashMap<>();
 
         // 查詢條件
-        // 在加上 WHERE 1=1 後，下面的查詢條件便可以直接拼在 sql 後面
-        // 如此做法可以使 SQL 語法簡潔許多，是相當常見的一種用法
-        if(productQueryParams.getCategory() != null) {
-            sql = sql + " AND category = :category";
-            map.put("category", productQueryParams.getCategory());
-        }
-
-        // 要把 "%" 寫在 map.put 裡面，不可以寫在 sql 語句裡面
-        if(productQueryParams.getSearch() != null) {
-            sql = sql + " AND product_name LIKE :search";
-            map.put("search", "%" + productQueryParams.getSearch() + "%");
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         // 排序
         // 實作時只能使用字串拼接的方式實現 ORDER BY 的語法
@@ -187,5 +166,26 @@ public class ProductDaoImpl implements ProductDao {
         map.put("productId", productId);
 
         namedParameterJdbcTemplate.update(sql, map);
+    }
+
+    // 提煉重複程式使其成為一獨立方法(優先使用 private 去限縮程式使用範圍), 如此可降低維護成本
+    // 使用 private 的好處: 只要其他 class 沒使用到這個方法, 即使刪除它也不會對整體造成影響
+    private String addFilteringSql(String sql, Map<String, Object> map, ProductQueryParams productQueryParams) {
+
+        // 查詢條件
+        // 在加上 WHERE 1=1 後，下面的查詢條件便可以直接拼在 sql 後面
+        // 如此做法可以使 SQL 語法簡潔許多，是相當常見的一種用法
+        if(productQueryParams.getCategory() != null) {
+            sql = sql + " AND category = :category";
+            map.put("category", productQueryParams.getCategory());
+        }
+
+        // 要把 "%" 寫在 map.put 裡面，不可以寫在 sql 語句裡面
+        if(productQueryParams.getSearch() != null) {
+            sql = sql + " AND product_name LIKE :search";
+            map.put("search", "%" + productQueryParams.getSearch() + "%");
+        }
+
+        return sql;
     }
 }
