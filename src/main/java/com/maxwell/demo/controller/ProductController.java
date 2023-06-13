@@ -19,6 +19,7 @@ import com.maxwell.demo.dto.ProductQueryParams;
 import com.maxwell.demo.dto.ProductRequest;
 import com.maxwell.demo.model.Product;
 import com.maxwell.demo.service.ProductService;
+import com.maxwell.demo.util.Page;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -35,7 +36,7 @@ public class ProductController {
     // 但是在一般情況中， category 理論上不應為必選
     // 因此要在 category 前加上 @RequestParam(required = false)
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts(
+    public ResponseEntity<Page<Product>> getProducts(
         // Filtering
         @RequestParam(required = false) String category, 
         @RequestParam(required = false) String search,
@@ -61,10 +62,21 @@ public class ProductController {
         productQueryParams.setLimit(limit);
         productQueryParams.setOffset(offset);
 
+        // 取得 Product list
         List<Product> productList = productService.getProducts(productQueryParams);
+
+        // 取得 product 總數
+        Integer total = productService.countProduct(productQueryParams);
     
+        // 分頁
+        Page<Product> page = new Page<>();
+        page.setLimit(limit);
+        page.setOffset(offset);
+        page.setTotal(total);
+        page.setResults(productList);
+
         // 無論結果為何, 都要回傳 200 OK
-        return ResponseEntity.status(HttpStatus.OK).body(productList);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @GetMapping("/products/{productId}")

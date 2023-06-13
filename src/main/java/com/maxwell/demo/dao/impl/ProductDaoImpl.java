@@ -24,6 +24,32 @@ public class ProductDaoImpl implements ProductDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Override
+    public Integer countProduct(ProductQueryParams productQueryParams) {
+        String sql = "SELECT count(*) FROM product WHERE 1=1";
+
+        Map<String, Object> map = new HashMap<>();
+
+        // 查詢條件
+        // 在加上 WHERE 1=1 後，下面的查詢條件便可以直接拼在 sql 後面
+        // 如此做法可以使 SQL 語法簡潔許多，是相當常見的一種用法
+        if(productQueryParams.getCategory() != null) {
+            sql = sql + " AND category = :category";
+            map.put("category", productQueryParams.getCategory());
+        }
+
+        // 要把 "%" 寫在 map.put 裡面，不可以寫在 sql 語句裡面
+        if(productQueryParams.getSearch() != null) {
+            sql = sql + " AND product_name LIKE :search";
+            map.put("search", "%" + productQueryParams.getSearch() + "%");
+        }
+
+        Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+
+        return total;
+    }
+    
+    @Override
     public List<Product> getProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT product_id, " +
                             "product_name, " +
@@ -70,6 +96,7 @@ public class ProductDaoImpl implements ProductDao {
 
     // 1. 記得創建 DATABASE
     // 2. SQL 要分段的話記得加上空格, 不然在輸出時字串會黏在一起造成錯誤
+    @Override
     public Product getProductById(Integer productId) {
         String sql = "SELECT product_id, " +
                             "product_name, " +
