@@ -32,14 +32,21 @@ public class ProductController {
     // 因此要在 category 前加上 @RequestParam(required = false)
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getProducts(
+        // Filtering
         @RequestParam(required = false) String category, 
-        @RequestParam(required = false) String search
+        @RequestParam(required = false) String search,
+        
+        // Sorting
+        @RequestParam(defaultValue = "created_date") String orderBy,
+        @RequestParam(defaultValue = "desc") String sort
     ) {
 
         // 使用 productqueryparams 儲存參數, 如此在 controller 便只需傳遞一個參數
         ProductQueryParams productQueryParams = new ProductQueryParams();
         productQueryParams.setCategory(category);
         productQueryParams.setSearch(search);
+        productQueryParams.setOrderBy(orderBy);
+        productQueryParams.setSort(sort);
 
         List<Product> productList = productService.getProducts(productQueryParams);
     
